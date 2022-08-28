@@ -62,8 +62,10 @@ def play_song(client, queue, song):
         else:
             asyncio.run_coroutine_threadsafe(client.disconnect(), bot.loop)
 
+    
     client.play(source, after=next)
 
+# commande pour jouer de la musique
 @bot.command()
 async def play(ctx, url):
     print("play!")
@@ -77,7 +79,14 @@ async def play(ctx, url):
         video = Video(url)
         musics[ctx.guild] = []
         client = await channel.connect()
-        await ctx.send(f"je lance : {video.url}")        
+        
+        # suppression du message de commande
+        messages = await ctx.channel.history(limit=1).flatten()
+        
+        for each in messages:
+            await each.delete()
+        
+        await ctx.send(f"```je lance : {video.url}```")        
         play_song(client, musics[ctx.guild], video)
 
 bot.run(os.getenv("TOKEN"))
